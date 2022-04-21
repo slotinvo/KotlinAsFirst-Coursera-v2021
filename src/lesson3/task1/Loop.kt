@@ -3,6 +3,9 @@
 package lesson3.task1
 
 import lesson1.task1.sqr
+
+import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.*
 
 // Урок 3: циклы
@@ -243,24 +246,27 @@ fun hasDifferentDigits(n: Int): Boolean {
  * Подумайте, как добиться более быстрой сходимости ряда при больших значениях x.
  * Использовать kotlin.math.sin и другие стандартные реализации функции синуса в этой задаче запрещается.
  */
+
 fun sin(x: Double, eps: Double): Double {
-    var lessx = x
-    while(abs(lessx) > 2 * PI) {
-        if (lessx > 0) {
-            lessx -= 2 * PI
-        }
-        if (lessx < 0) {
-            lessx += 2 * PI
-        }
-    }
     var x0 = x
     var elem = 3
     var sum = 0.0
-    while (abs(x0) >= eps) {
-        sum += x0
-        x0 = -x0 * x * x / (elem * (elem - 1))
-        elem += 2
+    if (x0 > 2 * PI) {
+        while (x0 > 2 * PI) {
+            x0 -= 2 * PI
+        }
     }
+    if (x0 < -2 * PI) {
+        while (x0 < -2 * PI) {
+            x0 += 2 * PI
+        }
+    }
+    var x1 = x0
+    do {
+        sum += x0
+        x0 = -x0 * x1 * x1 / (elem * (elem - 1))
+        elem += 2
+    } while (abs(x0) >= eps)
     return sum
 }
 
