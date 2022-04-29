@@ -75,7 +75,22 @@ fun deleteMarked(inputName: String, outputName: String) {
  * Регистр букв игнорировать, то есть буквы е и Е считать одинаковыми.
  *
  */
-fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> = TODO()
+fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
+    val res = mutableMapOf<String, Int>()
+    var lowerLine: String
+    for (str in substrings) {
+        res[str] = 0
+        for (line in File(inputName).readLines()) {
+            lowerLine = line.toLowerCase()
+            for (index in lowerLine.indices) {
+                if (index + str.length > lowerLine.length) continue
+                if (lowerLine.substring(index, index + str.length) == str.toLowerCase())
+                    res[str] = res[str]!! + 1
+            }
+        }
+    }
+    return res
+}
 
 
 /**
@@ -92,7 +107,26 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  *
  */
 fun sibilants(inputName: String, outputName: String) {
-    TODO()
+    val findLetters = listOf('ж', 'ч', 'ш', 'щ')
+    val replaceLetters = mapOf('ы' to 'и', 'я' to 'а', 'ю' to 'у')
+    val outputStream = File(outputName).bufferedWriter()
+    for (line in File(inputName).readLines()) {
+        var iline = ""
+        var tmp = ""
+        for (letterNum in line.indices)
+            if (tmp == "") {
+                if ((line[letterNum].toLowerCase() in findLetters) && (letterNum != line.length - 1))
+                    if (line[letterNum + 1] in replaceLetters.keys)
+                        tmp = replaceLetters[line[letterNum + 1]].toString()
+                    else if (line[letterNum + 1].toLowerCase() in replaceLetters.keys)
+                        tmp = replaceLetters[line[letterNum + 1].toLowerCase()].toString().toUpperCase()
+                iline += line[letterNum].toString() + tmp
+            } else
+                tmp = ""
+        outputStream.write(iline)
+        outputStream.newLine()
+    }
+    outputStream.close()
 }
 
 /**
@@ -113,7 +147,21 @@ fun sibilants(inputName: String, outputName: String) {
  *
  */
 fun centerFile(inputName: String, outputName: String) {
-    TODO()
+    var maxLine = 0
+    for (line in File(inputName).readLines())
+        if (line.trim().length > maxLine)
+            maxLine = line.trim().length
+    val outputStream = File(outputName).bufferedWriter()
+    for (line in File(inputName).readLines()) {
+        var center = (maxLine - line.trim().length) / 2
+        while (center > 0) {
+            outputStream.write(" ")
+            center--
+        }
+        outputStream.write(line.trim())
+        outputStream.newLine()
+    }
+    outputStream.close()
 }
 
 /**
@@ -144,7 +192,51 @@ fun centerFile(inputName: String, outputName: String) {
  * 8) Если входной файл удовлетворяет требованиям 1-7, то он должен быть в точности идентичен выходному файлу
  */
 fun alignFileByWidth(inputName: String, outputName: String) {
-    TODO()
+    val fileCopy = File(outputName).bufferedWriter()
+    var maxLine = 0
+    val res = mutableListOf<String>()
+    for (line in File(inputName).readLines()) {
+        var str = ""
+        for (item in line.trim().split(" ")) {
+            if (item != "") {
+                str += "$item "
+            }
+        }
+        res.add(str.trim())
+        if (maxLine <= str.length - 1) {
+            maxLine = str.length - 1
+        }
+    }
+    for (i in res) {
+        val c = i.split(" ")
+        var str = ""
+        if (maxLine == i.length || c.size == 1) {
+            fileCopy.write(i)
+        } else {
+            val size = c.size - 1
+            val n = maxLine - i.length + size
+            val a = n / size
+            if (a * size == n) {
+                for (item in c) {
+                    str += item
+                    for (j in 0 until a) str += " "
+                }
+            } else {
+                val z = n - a * size
+                for (element in 0 until c.size) {
+                    str += c[element]
+                    if (element >= z)
+                        for (j in 0 until a) str += " "
+                    else
+                        for (j in 0..a) str += " "
+
+                }
+            }
+        }
+        fileCopy.write(str.trim())
+        fileCopy.newLine()
+    }
+    fileCopy.close()
 }
 
 /**
@@ -233,7 +325,22 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun chooseLongestChaoticWord(inputName: String, outputName: String) {
-    TODO()
+    val words = StringBuilder()
+    var maxLine = 0
+    for (line in File(inputName).readLines()) {
+        val lines = mutableSetOf<Char>()
+        for (wrd in line) {
+            lines.add(wrd.toLowerCase())
+            if (lines.size == line.length && line.length > maxLine) {
+                words.clear().append(line)
+                maxLine = line.length
+            } else if (lines.size == line.length && line.length == maxLine)
+                words.append(", $line")
+        }
+    }
+    val outputStream = File(outputName).bufferedWriter()
+    outputStream.write(words.toString())
+    outputStream.close()
 }
 
 /**
